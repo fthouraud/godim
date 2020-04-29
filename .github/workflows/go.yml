@@ -1,0 +1,42 @@
+name: Go
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        go: [ '1.11', '1.12', '1.13', '1.14' ]
+
+    steps:
+    - name: Set up Go ${{ matrix.go }}
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.go }}
+
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        make dep
+
+    - name: Build
+      run: |
+        make build
+
+    - name: Check format
+      run: |
+        make fmt-check
+        make test
+        make test-cover
+
+    - name: Tests
+      run: |
+        make test
+        make test-cover
